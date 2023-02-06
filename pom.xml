@@ -68,7 +68,7 @@
 						</executions>
 						<configuration>
 							<imageName>
-								${appName}-${project.version}${executable-suffix}</imageName>
+								${appName}-${project.version}</imageName>
 							<mainClass>${mainClass}</mainClass>
 							<buildArgs>
 								<buildArg>--no-fallback</buildArg>
