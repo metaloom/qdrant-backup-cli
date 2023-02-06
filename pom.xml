@@ -16,7 +16,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<native.maven.plugin.version>0.9.19</native.maven.plugin.version>
 		<graalvm-sdk.version>22.3.1</graalvm-sdk.version>
-		<qdrant.client.version>0.10.0-SNAPSHOT</qdrant.client.version>
+		<qdrant.client.version>0.9.0</qdrant.client.version>
 		<pico-cli.version>4.7.1</pico-cli.version>
 		<mainClass>io.metaloom.qdrant.cli.QDrantCLI</mainClass>
 		<appName>qdrant-backup-cli</appName>
@@ -54,7 +54,6 @@
 							<buildArgs>
 								<buildArg>--no-fallback</buildArg>
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
-								<buildArg>--verbose</buildArg>
 							</buildArgs>
 						</configuration>
 					</plugin>
@@ -121,6 +120,33 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.2.1</version>
+				<executions>
+					<execution>
+						<?m2e ignore?>
+						<id>enforce-versions</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.8.6</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>17</version>
+								</requireJavaVersion>
+								<requireOS>
+									<family>unix</family>
+								</requireOS>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
