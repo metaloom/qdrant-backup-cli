@@ -52,7 +52,7 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Action"
           git commit -a -m "🏁 Releasing version $RELEASE_VERSION"
-          git push origin HEAD:main
+          git push origin HEAD:master
           HEAD=`git rev-parse HEAD`
           echo "NEXT_VERSION=$(echo $NEXT_VERSION)" >>$GITHUB_OUTPUT
           echo "HEAD=$(echo $HEAD)" >>$GITHUB_OUTPUT
@@ -139,4 +139,4 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Action"
           git commit -a -m "⬆️  Next version $NEXT_VERSION"
-          git push origin HEAD:main
+          git push origin HEAD:master
