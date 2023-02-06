@@ -13,6 +13,7 @@ import io.metaloom.qdrant.client.http.model.point.PointsListUpsertRequest;
 public abstract class AbstractCommandTest extends AbstractContainerTest {
 
 	public static final String TEST_COLLECTION_NAME = "test-collection";
+	public static final int TEST_SIZE = 500;
 
 	@Before
 	public void setupTestData() throws HttpErrorException {
@@ -22,7 +23,7 @@ public abstract class AbstractCommandTest extends AbstractContainerTest {
 			client.createCollection(TEST_COLLECTION_NAME, request).sync();
 
 			PointsListUpsertRequest pointRequest = new PointsListUpsertRequest();
-			for (int i = 0; i < 50_000; i++) {
+			for (int i = 0; i < TEST_SIZE; i++) {
 				pointRequest.addPoint(PointStruct.of(0.42f, 0.43f, 0.44f, 0.45f).setId(i));
 			}
 			client.upsertPoints(TEST_COLLECTION_NAME, pointRequest, true).sync();

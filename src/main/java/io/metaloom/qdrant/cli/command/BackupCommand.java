@@ -24,10 +24,10 @@ public class BackupCommand extends AbstractQDrantCommand {
 	public static final Logger log = LoggerFactory.getLogger(BackupCommand.class);
 
 	@Command(name = "collections", description = "Backup collections")
-	public int backupCollections(@Option(names = { "-b", "--batch-size" }, description = "Size of the point batches being loaded from the server. Default: "
-		+ DEFAULT_BATCH_SIZE, defaultValue = DEFAULT_BATCH_SIZE_STR) int batchSize,
-		@Parameters(index = "0", description = "Path to the output file to which the backup will be written. Use - for stdout.") String outputPath
-		) {
+	public int backupCollections(
+		@Option(names = { "-b", "--batch-size" }, description = "Size of the point batches being loaded from the server. Default: "
+			+ DEFAULT_BATCH_SIZE, defaultValue = DEFAULT_BATCH_SIZE_STR) int batchSize,
+		@Parameters(index = "0", description = "Path to the output file to which the backup will be written. Use - for stdout.") String outputPath) {
 		try {
 			return 0;
 		} catch (Exception e) {
@@ -52,7 +52,9 @@ public class BackupCommand extends AbstractQDrantCommand {
 			}
 			int port = getPort();
 			String host = getHostname();
-			System.out.println("Connecting to " + host + ":" + port + " using " + collectionName + " batch-size: " + batchSize);
+			if (log.isDebugEnabled()) {
+				log.debug("Connecting to " + host + ":" + port + " using " + collectionName + " batch-size: " + batchSize);
+			}
 			try (QDrantHttpClient client = QDrantHttpClient.builder().setHostname(host).setPort(port).build()) {
 				if (outputPath.equals("-")) {
 					try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out))) {
@@ -60,10 +62,10 @@ public class BackupCommand extends AbstractQDrantCommand {
 					}
 				} else {
 					File outputFile = new File(outputPath);
-//					if (!outputFile.canWrite()) {
-//						log.error("Unable to write to " + outputFile.getAbsolutePath());
-//						System.exit(12);
-//					}
+					// if (!outputFile.canWrite()) {
+					// log.error("Unable to write to " + outputFile.getAbsolutePath());
+					// System.exit(12);
+					// }
 					try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
 						scrollPoints(client, writer, collectionName, batchSize);
 					}

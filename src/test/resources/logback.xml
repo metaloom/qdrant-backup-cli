@@ -7,7 +7,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="io.metaloom" level="DEBUG" />
+	<logger name="io.metaloom" level="WARN" />
 
 	<root level="error">
 		<appender-ref ref="STDOUT" />
