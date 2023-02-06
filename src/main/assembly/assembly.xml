@@ -15,7 +15,7 @@
 			<outputDirectory>./</outputDirectory>
 		</file>
 		<file>
-			<source>${project.build.directory}/${project.artifactId}-${project.version}-runner${executable-suffix}</source>
+			<source>${project.build.directory}/${appName}-${project.version}${executable-suffix}</source>
 			<outputDirectory>./bin</outputDirectory>
 			<destName>${project.artifactId}${executable-suffix}</destName>
 			<fileMode>0755</fileMode>

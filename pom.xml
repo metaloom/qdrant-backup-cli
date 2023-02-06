@@ -14,6 +14,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<os-plugin.version>1.7.1</os-plugin.version>
 		<native.maven.plugin.version>0.9.19</native.maven.plugin.version>
 		<jreleaser-plugin.version>1.4.0</jreleaser-plugin.version>
 		<graalvm-sdk.version>22.3.1</graalvm-sdk.version>
@@ -62,11 +63,12 @@
 								<goals>
 									<goal>compile-no-fork</goal>
 								</goals>
-								<phase>package</phase>
+								<phase>prepare-package</phase>
 							</execution>
 						</executions>
 						<configuration>
-							<imageName>${appName}-${project.version}</imageName>
+							<imageName>
+								${appName}-${project.version}${executable-suffix}</imageName>
 							<mainClass>${mainClass}</mainClass>
 							<buildArgs>
 								<buildArg>--no-fallback</buildArg>
@@ -93,6 +95,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<configuration combine.self="append">
+							<attach>false</attach>
 							<skipAssembly>false</skipAssembly>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly.xml</descriptor>
@@ -243,6 +246,14 @@
 	</dependencies>
 
 	<build>
+		<extensions>
+			<extension>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>${os-plugin.version}</version>
+			</extension>
+		</extensions>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -291,6 +302,28 @@
 				<configuration>
 					<skipTests>true</skipTests>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<attach>false</attach>
+					<appendAssemblyId>false</appendAssemblyId>
+					<finalName>
+						${project.artifactId}-${project.version}-${os.detected.classifier}</finalName>
+					<outputDirectory>${project.build.directory}/distributions</outputDirectory>
+					<workDirectory>${project.build.directory}/assembly/work</workDirectory>
+					<skipAssembly>true</skipAssembly>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-distribution</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
