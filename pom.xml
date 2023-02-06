@@ -15,11 +15,14 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<native.maven.plugin.version>0.9.19</native.maven.plugin.version>
+		<jreleaser-plugin.version>1.4.0</jreleaser-plugin.version>
 		<graalvm-sdk.version>22.3.1</graalvm-sdk.version>
 		<qdrant.client.version>0.9.0</qdrant.client.version>
 		<pico-cli.version>4.7.1</pico-cli.version>
 		<mainClass>io.metaloom.qdrant.cli.QDrantCLI</mainClass>
 		<appName>qdrant-backup-cli</appName>
+		<executable-suffix />
+		<artifactsDir>target/distributions</artifactsDir>
 	</properties>
 
 	<profiles>
@@ -55,6 +58,120 @@
 								<buildArg>--no-fallback</buildArg>
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
 							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>dist</id>
+			<activation>
+				<property>
+					<name>dist</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<configuration>
+							<attach>false</attach>
+							<appendAssemblyId>false</appendAssemblyId>
+							<finalName>
+								${appName}-${project.version}-${os.detected.classifier}</finalName>
+							<outputDirectory>${app.distribution.directory}</outputDirectory>
+							<workDirectory>
+								${project.build.directory}/assembly/work</workDirectory>
+							<skipAssembly>true</skipAssembly>
+							<descriptors>
+								<descriptor>src/main/assembly/assembly.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-distribution</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>dist-windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<executable-suffix>.exe</executable-suffix>
+			</properties>
+		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jreleaser</groupId>
+						<artifactId>jreleaser-maven-plugin</artifactId>
+						<version>${jreleaser-plugin.version}</version>
+						<dependencies>
+							<dependency>
+								<groupId>commons-io</groupId>
+								<artifactId>commons-io</artifactId>
+								<version>2.11.0</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<jreleaser>
+								<release>
+									<github>
+										<tagName>v{{projectVersion}}</tagName>
+										<releaseName>v{{projectVersion}}</releaseName>
+										<overwrite>true</overwrite>
+										<changelog>
+											<formatted>ALWAYS</formatted>
+											<format>- {{commitShortHash}}
+												{{commitTitle}}</format>
+											<preset>conventional-commits</preset>
+											<contributors>
+												<format>- {{contributorName}}</format>
+											</contributors>
+											<hide>
+												<categories>merge</categories>
+												<contributors>GitHub,dependabot</contributors>
+											</hide>
+										</changelog>
+									</github>
+								</release>
+								<distributions>
+									<qdrant-backup-cli>
+										<type>NATIVE_IMAGE</type>
+										<artifacts>
+											<artifact>
+												<path>
+													{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.tar.gz</path>
+												<platform>linux-x86_64</platform>
+											</artifact>
+											<artifact>
+												<path>
+													{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip</path>
+												<platform>windows-x86_64</platform>
+											</artifact>
+											<artifact>
+												<path>
+													{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip</path>
+												<platform>osx-x86_64</platform>
+											</artifact>
+										</artifacts>
+									</qdrant-backup-cli>
+								</distributions>
+							</jreleaser>
 						</configuration>
 					</plugin>
 				</plugins>
