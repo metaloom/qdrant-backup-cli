@@ -277,9 +277,6 @@
 								<requireJavaVersion>
 									<version>17</version>
 								</requireJavaVersion>
-								<requireOS>
-									<family>unix</family>
-								</requireOS>
 							</rules>
 						</configuration>
 					</execution>
