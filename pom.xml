@@ -84,44 +84,6 @@
 					<name>dist</name>
 				</property>
 			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<configuration>
-							<attach>false</attach>
-							<appendAssemblyId>false</appendAssemblyId>
-							<finalName>
-								${appName}-${project.version}-${os.detected.classifier}</finalName>
-							<outputDirectory>${app.distribution.directory}</outputDirectory>
-							<workDirectory>
-								${project.build.directory}/assembly/work</workDirectory>
-							<skipAssembly>true</skipAssembly>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly.xml</descriptor>
-							</descriptors>
-						</configuration>
-						<executions>
-							<execution>
-								<id>make-distribution</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>dist</id>
-			<activation>
-				<property>
-					<name>dist</name>
-				</property>
-			</activation>
 			<properties>
 				<skipTests>true</skipTests>
 			</properties>
