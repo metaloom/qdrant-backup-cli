@@ -25,6 +25,28 @@
 		<artifactsDir>target/distributions</artifactsDir>
 	</properties>
 
+
+	<name>qdrant-backup-cli</name>
+	<description>qdrant-backup-cli - CLI to ease backup handling using the
+		Qdrant vector database.</description>
+	<inceptionYear>2023</inceptionYear>
+	<url>https://github.com/metaloom/qdrant-backup-cli</url>
+
+	<developers>
+		<developer>
+			<id>jotschi</id>
+			<name>Johannes Schüth</name>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>Apache-2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
 	<profiles>
 		<profile>
 			<id>native</id>
@@ -42,13 +64,6 @@
 									<goal>compile-no-fork</goal>
 								</goals>
 								<phase>package</phase>
-							</execution>
-							<execution>
-								<id>test-native</id>
-								<goals>
-									<goal>test</goal>
-								</goals>
-								<phase>test</phase>
 							</execution>
 						</executions>
 						<configuration>
