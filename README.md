@@ -16,6 +16,8 @@ Still in development
 - [x] Configure logging
 - [x] Add additional tests
 - [x] Add github actions building
+- [ ] Download snapshots
+- [ ] Get full collection info
 - [ ] Add sonarcloud checks
 - [x] Setup jreleaser native build releases to github
 - [ ] Remove bogus native-image files
@@ -23,6 +25,58 @@ Still in development
 - [ ] Check error handling
 - [x] Test locking, snapshot handling
 - [x] Maybe: Mac, Windows Build?
+
+
+## Usage Examples
+
+```bash
+./qdrant-backup-cli
+Usage: qdrant-backup-cli [-v] [-h=<hostname>] [-p=<port>] [COMMAND]
+CLI tool for the qdrant vector database
+  -h, --hostname=<hostname>
+                      Hostname to connect to
+                        Default: localhost
+  -p, --port=<port>   HTTP port to connect to.
+                        Default: 6333
+  -v
+Commands:
+  snapshot, s     Snapshot commands. (e.g. create and restore snapshots)
+  collection, co  Collection commands
+  cluster, cl     Cluster commands. (e.g. peer management, info)
+  point, p        Point commands
+  admin, a        Administrative commands. (e.g. lock, unlock)
+```
+
+```bash
+# Backup all points to file
+./qdrant-backup-cli -h localhost -p 6333 point backup -c collection-name backup.json
+
+# Or to stdout
+./qdrant-backup-cli -h localhost -p 6333 point backup -c collection-name -
+
+# Backup collections to file
+./qdrant-backup-cli -h localhost -p 6333 collection backup backup.json
+
+# Count points
+./qdrant-backup-cli -h localhost -p 6333 point count -c collection-name
+
+# Lock / Unlock
+./qdrant-backup-cli -h localhost -p 6333 admin lock
+./qdrant-backup-cli -h localhost -p 6333 admin unlock
+./qdrant-backup-cli -h localhost -p 6333 admin status
+
+# Create / List Restore Snapshots
+./qdrant-backup-cli -h localhost -p 6333 snapshot create collection-name
+
+# Use * to create snapshots for all collections
+./qdrant-backup-cli -h localhost -p 6333 snapshot create *
+./qdrant-backup-cli -h localhost -p 6333 snapshot list collection-name
+./qdrant-backup-cli -h localhost -p 6333 snapshot restore collection-name "file:///qdrant/snapshots/test-collection/test-collection-5936205438334902491-2023-02-07-11-34-34.snapshot"
+
+# Cluster Info / Peer Removal
+./qdrant-backup-cli -h localhost -p 6333 cluster info
+```
+
 
 ## Building
 
