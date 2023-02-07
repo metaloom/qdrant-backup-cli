@@ -76,7 +76,10 @@
   "name":"io.metaloom.qdrant.cli.command.impl.CollectionCommand",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"backup","parameterTypes":["int","java.lang.String"] }
+  ]
 },
 {
   "name":"io.metaloom.qdrant.cli.command.impl.PointCommand",
@@ -118,6 +121,210 @@
   "queryAllDeclaredMethods":true
 },
 {
+  "name":"io.metaloom.qdrant.client.http.model.collection.CollectionDescription",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.CollectionInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getConfig","parameterTypes":[] }, 
+    {"name":"getIndexedVectorsCount","parameterTypes":[] }, 
+    {"name":"getOptimizerStatus","parameterTypes":[] }, 
+    {"name":"getPayloadSchema","parameterTypes":[] }, 
+    {"name":"getPointsCount","parameterTypes":[] }, 
+    {"name":"getSegmentsCount","parameterTypes":[] }, 
+    {"name":"getStatus","parameterTypes":[] }, 
+    {"name":"getVectorsCount","parameterTypes":[] }, 
+    {"name":"setConfig","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.config.CollectionConfig"] }, 
+    {"name":"setIndexedVectorsCount","parameterTypes":["int"] }, 
+    {"name":"setOptimizerStatus","parameterTypes":["java.lang.String"] }, 
+    {"name":"setPayloadSchema","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.PayloadIndexInfo"] }, 
+    {"name":"setPayloadSchema","parameterTypes":["java.util.Map"] }, 
+    {"name":"setPointsCount","parameterTypes":["int"] }, 
+    {"name":"setSegmentsCount","parameterTypes":["int"] }, 
+    {"name":"setStatus","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.CollectionStatus"] }, 
+    {"name":"setVectorsCount","parameterTypes":["int"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.CollectionListResponse",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setResult","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.CollectionsResponse"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.CollectionResponse",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setResult","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.CollectionInfo"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.CollectionStatus",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"getName","parameterTypes":[] }]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.CollectionsResponse",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setCollections","parameterTypes":["java.util.List"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.PayloadIndexInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.PayloadSchemaParams",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"getName","parameterTypes":[] }]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.PayloadSchemaType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.config.CollectionConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getHnswConfig","parameterTypes":[] }, 
+    {"name":"getOptimizerConfig","parameterTypes":[] }, 
+    {"name":"getParams","parameterTypes":[] }, 
+    {"name":"getWalConfig","parameterTypes":[] }, 
+    {"name":"setHnswConfig","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.config.HnswConfig"] }, 
+    {"name":"setOptimizerConfig","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.config.OptimizersConfig"] }, 
+    {"name":"setParams","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.config.CollectionParams"] }, 
+    {"name":"setWalConfig","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.config.WalConfig"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.config.CollectionParams",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getOnDiskPayload","parameterTypes":[] }, 
+    {"name":"getReplicationFactor","parameterTypes":[] }, 
+    {"name":"getShardNumber","parameterTypes":[] }, 
+    {"name":"getVectors","parameterTypes":[] }, 
+    {"name":"getWriteConsistencyFactor","parameterTypes":[] }, 
+    {"name":"setOnDiskPayload","parameterTypes":["java.lang.Boolean"] }, 
+    {"name":"setReplicationFactor","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setShardNumber","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setVectors","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.config.VectorParams"] }, 
+    {"name":"setWriteConsistencyFactor","parameterTypes":["java.lang.Integer"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.config.Distance",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"getName","parameterTypes":[] }]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.config.HnswConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getEfConstruct","parameterTypes":[] }, 
+    {"name":"getFullScanThreshold","parameterTypes":[] }, 
+    {"name":"getM","parameterTypes":[] }, 
+    {"name":"getMaxIndexingThreads","parameterTypes":[] }, 
+    {"name":"getOnDisk","parameterTypes":[] }, 
+    {"name":"getPayloadM","parameterTypes":[] }, 
+    {"name":"setEfConstruct","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setFullScanThreshold","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setM","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setMaxIndexingThreads","parameterTypes":["java.lang.Integer"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.config.OptimizersConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getDeletedThreshold","parameterTypes":[] }, 
+    {"name":"getFlushIntervalSec","parameterTypes":[] }, 
+    {"name":"getIndexingThreshold","parameterTypes":[] }, 
+    {"name":"getMaxOptimizationThreads","parameterTypes":[] }, 
+    {"name":"getMaxSegmentSize","parameterTypes":[] }, 
+    {"name":"getMemmapThreshold","parameterTypes":[] }, 
+    {"name":"getVacuumMinVectorNumber","parameterTypes":[] }, 
+    {"name":"setDeletedThreshold","parameterTypes":["java.lang.Double"] }, 
+    {"name":"setFlushIntervalSec","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setIndexingThreshold","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setMaxOptimizationThreads","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setMaxSegmentSize","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setMemmapThreshold","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setVacuumMinVectorNumber","parameterTypes":["java.lang.Integer"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.config.VectorParams",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getDistance","parameterTypes":[] }, 
+    {"name":"getSize","parameterTypes":[] }, 
+    {"name":"setDistance","parameterTypes":["io.metaloom.qdrant.client.http.model.collection.config.Distance"] }, 
+    {"name":"setSize","parameterTypes":["long"] }
+  ]
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.config.VectorsConfig",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"io.metaloom.qdrant.client.http.model.collection.config.WalConfig",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getWalCapacityMB","parameterTypes":[] }, 
+    {"name":"getWalSegmentsAhead","parameterTypes":[] }, 
+    {"name":"setWalCapacityMB","parameterTypes":["java.lang.Integer"] }, 
+    {"name":"setWalSegmentsAhead","parameterTypes":["java.lang.Integer"] }
+  ]
+},
+{
   "name":"io.metaloom.qdrant.client.http.model.point.CountResult",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -148,6 +355,25 @@
   ]
 },
 {
+  "name":"java.io.Serializable",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"java.lang.Comparable",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"java.lang.Double",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true
+},
+{
+  "name":"java.lang.Number",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
   "name":"java.lang.Object",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true
@@ -156,8 +382,20 @@
   "name":"java.lang.String"
 },
 {
+  "name":"java.lang.System",
+  "methods":[{"name":"console","parameterTypes":[] }]
+},
+{
   "name":"java.lang.Throwable",
   "methods":[{"name":"getSuppressed","parameterTypes":[] }]
+},
+{
+  "name":"java.lang.constant.Constable",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"java.lang.constant.ConstantDesc",
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"java.lang.reflect.Executable",

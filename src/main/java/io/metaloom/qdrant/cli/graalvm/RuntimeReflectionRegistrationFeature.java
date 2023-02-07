@@ -11,8 +11,12 @@ import io.metaloom.qdrant.client.http.model.cluster.ClusterInfoResponse;
 import io.metaloom.qdrant.client.http.model.cluster.ClusterStatus;
 import io.metaloom.qdrant.client.http.model.cluster.ClusterStatusResponse;
 import io.metaloom.qdrant.client.http.model.collection.CollectionDescription;
+import io.metaloom.qdrant.client.http.model.collection.CollectionInfo;
 import io.metaloom.qdrant.client.http.model.collection.CollectionListResponse;
+import io.metaloom.qdrant.client.http.model.collection.CollectionResponse;
+import io.metaloom.qdrant.client.http.model.collection.CollectionStatus;
 import io.metaloom.qdrant.client.http.model.collection.CollectionsResponse;
+import io.metaloom.qdrant.client.http.model.collection.PayloadIndexInfo;
 import io.metaloom.qdrant.client.http.model.collection.filter.Filter;
 import io.metaloom.qdrant.client.http.model.point.CountResult;
 import io.metaloom.qdrant.client.http.model.point.Payload;
@@ -62,6 +66,9 @@ class RuntimeReflectionRegistrationFeature implements Feature {
 		registerFully(CollectionListResponse.class);
 		registerFully(CollectionsResponse.class);
 		registerFully(CollectionDescription.class);
+		registerFully(CollectionResponse.class);
+		registerFully(CollectionInfo.class);
+		registerFully(PayloadIndexInfo.class);
 
 		// Cluster / Locking
 		registerFully(ClusterStatusResponse.class);

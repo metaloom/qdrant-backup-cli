@@ -18,7 +18,7 @@
 		<native.maven.plugin.version>0.9.19</native.maven.plugin.version>
 		<jreleaser-plugin.version>1.4.0</jreleaser-plugin.version>
 		<graalvm-sdk.version>22.3.1</graalvm-sdk.version>
-		<qdrant.client.version>0.9.0</qdrant.client.version>
+		<qdrant.client.version>0.10.0</qdrant.client.version>
 		<pico-cli.version>4.7.1</pico-cli.version>
 		<mainClass>io.metaloom.qdrant.cli.QDrantCLI</mainClass>
 		<appName>qdrant-backup-cli</appName>
@@ -94,7 +94,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<configuration combine.self="append">
+						<configuration>
 							<attach>false</attach>
 							<skipAssembly>false</skipAssembly>
 							<descriptors>

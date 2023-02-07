@@ -8,21 +8,21 @@ Still in development
 
 ## Open Tasks
 
-- [x] Add maven enforcer plugin
 - [ ] Document exit code
-- [ ] Document usage
 - [ ] Add env variable support
 - [ ] Test junit 5 / eclipse / native test execution
+- [ ] Download snapshots
+- [ ] Add sonarcloud checks
+- [ ] Remove bogus native-image files
+- [x] Use count API to enable progress computation and add ETA
+- [x] Add maven enforcer plugin
+- [x] Document usage
 - [x] Configure logging
 - [x] Add additional tests
 - [x] Add github actions building
-- [ ] Download snapshots
-- [ ] Get full collection info
-- [ ] Add sonarcloud checks
+- [x] Get full collection info
 - [x] Setup jreleaser native build releases to github
-- [ ] Remove bogus native-image files
-- [ ] Use count API to enable progress computation and add ETA
-- [ ] Check error handling
+- [x] Check error handling
 - [x] Test locking, snapshot handling
 - [x] Maybe: Mac, Windows Build?
 

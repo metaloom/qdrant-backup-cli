@@ -1,5 +1,6 @@
 package io.metaloom.qdrant.cli.command.action.impl;
 
+import static io.metaloom.qdrant.cli.ExitCode.FILE_ERROR;
 import static io.metaloom.qdrant.cli.ExitCode.INVALID_PARAMETER;
 import static io.metaloom.qdrant.cli.ExitCode.OK;
 import static io.metaloom.qdrant.cli.ExitCode.SERVER_FAILURE;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import io.metaloom.qdrant.cli.ExitCode;
 import io.metaloom.qdrant.cli.command.QDrantCommand;
 import io.metaloom.qdrant.cli.command.action.AbstractAction;
+import io.metaloom.qdrant.cli.eta.ETAUtil;
 import io.metaloom.qdrant.client.http.QDrantHttpClient;
 import io.metaloom.qdrant.client.http.model.point.PointCountRequest;
 import io.metaloom.qdrant.client.http.model.point.PointCountResponse;
@@ -46,19 +48,29 @@ public class PointAction extends AbstractAction {
 			log.debug("Connecting to {} : {} using {} batch-size: {} ", host, port, collectionName, batchSize);
 		}
 		return withClient(client -> {
+			PointCountRequest request = new PointCountRequest();
+			request.setExact(true);
+			PointCountResponse response = client.countPoints(collectionName, request).sync();
+			if (!isSuccess(response)) {
+				log.error("Loading point count of collection {} failed.", collectionName);
+				return SERVER_FAILURE;
+			}
+			long totalCount = response.getResult().getCount();
+			long totalWritten = 0;
 			if (outputPath.equals("-")) {
 				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out))) {
-					scrollPoints(client, writer, collectionName, batchSize);
+					totalWritten = scrollPoints(client, writer, collectionName, batchSize, totalCount, false);
 				}
 			} else {
 				File outputFile = new File(outputPath);
-				// if (!outputFile.canWrite()) {
-				// log.error("Unable to write to " + outputFile.getAbsolutePath());
-				// System.exit(12);
-				// }
-				try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-					scrollPoints(client, writer, collectionName, batchSize);
+				if (outputFile.exists()) {
+					log.error("Output file already inplace.");
+					return FILE_ERROR;
 				}
+				try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+					totalWritten = scrollPoints(client, writer, collectionName, batchSize, totalCount, true);
+				}
+				log.info("Backup of {} points written to {}", totalWritten, outputPath);
 			}
 			return OK;
 		});
@@ -85,9 +97,11 @@ public class PointAction extends AbstractAction {
 		});
 	}
 
-	private void scrollPoints(QDrantHttpClient client, BufferedWriter writer, String collectionName, int batchSize)
-			throws Exception {
+	private long scrollPoints(QDrantHttpClient client, BufferedWriter writer, String collectionName, int batchSize,
+			long totalCount, boolean printETA) throws Exception {
+		long current = 0;
 		Long offset = 0L;
+		long start = System.currentTimeMillis();
 		while (true) {
 			PointsScrollRequest request = new PointsScrollRequest();
 			request.setLimit(batchSize);
@@ -107,6 +121,11 @@ public class PointAction extends AbstractAction {
 					if (log.isTraceEnabled()) {
 						log.trace(json);
 					}
+					current++;
+					if (printETA && current % 10_000 == 0) {
+						log.info("[" + ETAUtil.getPercent(current, totalCount) + "] "
+								+ ETAUtil.getETA(current, totalCount, start, System.currentTimeMillis()));
+					}
 				}
 				writer.flush();
 				offset = result.getNextPageOffset();
@@ -118,7 +137,9 @@ public class PointAction extends AbstractAction {
 				break;
 			}
 		}
+		log.info("[" + ETAUtil.getPercent(totalCount, totalCount) + "]");
 		writer.flush();
+		return current;
 
 	}
 
