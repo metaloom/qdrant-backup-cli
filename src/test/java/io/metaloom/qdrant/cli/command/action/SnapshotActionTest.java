@@ -28,23 +28,24 @@ public class SnapshotActionTest extends AbstractCLITest {
 			assertEquals(OK, action.snapshot(TEST_COLLECTION_NAME));
 		});
 		assertEquals("""
-			Creating snapshot for collection [test-collection]
-			Snapshot for collection test-collection successfully created.
-			""", out2);
+				Creating snapshot for collection [test-collection]
+				Snapshot for collection test-collection successfully created.
+				""", out2);
 
 		// 3. Assert snapshot listed
 		String out3 = captureStdOut(() -> {
 			assertEquals(OK, action.list(TEST_COLLECTION_NAME));
 		});
-		String snapshotName = out3.split("\n")[1].split(" ")[0];
+		String snapshotName = out3.split("\n")[1].split("\t")[0];
 
 		// 4. Assert recovery
 		String location = "file:///qdrant/snapshots/" + TEST_COLLECTION_NAME + "/" + snapshotName;
 		String out4 = captureStdOut(() -> {
-			assertEquals(OK, action.recover(TEST_COLLECTION_NAME, location));
+			assertEquals("Failed to recover snapshot using location " + location, OK,
+					action.recover(TEST_COLLECTION_NAME, location));
 		});
 		String expected = "Recover from snapshot [" + location + "] to collection [" + TEST_COLLECTION_NAME + "]\n"
-			+ "Recovery completed without errors.\n";
+				+ "Recovery completed without errors.\n";
 
 		assertEquals(expected, out4);
 	}
