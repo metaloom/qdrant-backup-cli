@@ -1,11 +1,11 @@
 package io.metaloom.qdrant.cli;
 
 import ch.qos.logback.classic.Level;
-import io.metaloom.qdrant.cli.command.AdminCommand;
-import io.metaloom.qdrant.cli.command.BackupCommand;
-import io.metaloom.qdrant.cli.command.ClusterCommand;
-import io.metaloom.qdrant.cli.command.SnapshotCommand;
-import io.metaloom.qdrant.client.json.Json;
+import io.metaloom.qdrant.cli.command.impl.AdminCommand;
+import io.metaloom.qdrant.cli.command.impl.ClusterCommand;
+import io.metaloom.qdrant.cli.command.impl.CollectionCommand;
+import io.metaloom.qdrant.cli.command.impl.PointCommand;
+import io.metaloom.qdrant.cli.command.impl.SnapshotCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -13,12 +13,11 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
 import picocli.CommandLine.Spec;
 
-@Command(name = "qdrant-cli", mixinStandardHelpOptions = false, version = "qdrant-cli 0.9.0", description = "CLI tool for the qdrant vector database", showDefaultValues = true, subcommands = {
-	BackupCommand.class,
+@Command(name = "qdrant-backup-cli", mixinStandardHelpOptions = false, version = "qdrant-backup-cli 0.9.0", description = "CLI tool for the qdrant vector database", showDefaultValues = true, subcommands = {
 	SnapshotCommand.class,
-	// CollectionCommand.class,
+	CollectionCommand.class,
 	ClusterCommand.class,
-	// PointCommand.class,
+	PointCommand.class,
 	AdminCommand.class
 })
 public class QDrantCLI implements Runnable {
@@ -74,8 +73,7 @@ public class QDrantCLI implements Runnable {
 
 	public static int execute(String[] args) {
 		CommandLine cmd = new CommandLine(QDrantCLI.instance());
-		int exitCode = cmd.execute(args);
-		return exitCode;
+		return cmd.execute(args);
 	}
 
 	@Override

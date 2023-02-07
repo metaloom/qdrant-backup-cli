@@ -11,7 +11,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-public class BackupCommandTest extends AbstractCommandTest {
+public class PointCommandTest extends AbstractCLITest {
 
 	@Test
 	public void testBackup() throws IOException {

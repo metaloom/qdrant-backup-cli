@@ -1,4 +1,9 @@
-package io.metaloom.qdrant.cli.command;
+package io.metaloom.qdrant.cli.command.action.impl;
+
+import static io.metaloom.qdrant.cli.ExitCode.ERROR;
+import static io.metaloom.qdrant.cli.ExitCode.INVALID_PARAMETER;
+import static io.metaloom.qdrant.cli.ExitCode.OK;
+import static io.metaloom.qdrant.cli.ExitCode.SERVER_FAILURE;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,54 +13,37 @@ import java.io.OutputStreamWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.metaloom.qdrant.cli.ExitCode;
+import io.metaloom.qdrant.cli.command.QDrantCommand;
+import io.metaloom.qdrant.cli.command.action.AbstractAction;
 import io.metaloom.qdrant.client.http.QDrantHttpClient;
+import io.metaloom.qdrant.client.http.model.point.PointCountRequest;
+import io.metaloom.qdrant.client.http.model.point.PointCountResponse;
 import io.metaloom.qdrant.client.http.model.point.PointsScrollRequest;
 import io.metaloom.qdrant.client.http.model.point.PointsScrollResponse;
 import io.metaloom.qdrant.client.http.model.point.Record;
 import io.metaloom.qdrant.client.http.model.point.ScrollResult;
 import io.metaloom.qdrant.client.json.Json;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
-@Command(name = "backup", aliases = { "b" }, description = "Backup commands. (e.g. NDJson dump of points/collections)")
-public class BackupCommand extends AbstractQDrantCommand {
+public class PointAction extends AbstractAction {
 
-	public static final Logger log = LoggerFactory.getLogger(BackupCommand.class);
+	public static final Logger log = LoggerFactory.getLogger(PointAction.class);
 
-	@Command(name = "collections", description = "Backup collections")
-	public int backupCollections(
-		@Option(names = { "-b", "--batch-size" }, description = "Size of the point batches being loaded from the server. Default: "
-			+ DEFAULT_BATCH_SIZE, defaultValue = DEFAULT_BATCH_SIZE_STR) int batchSize,
-		@Parameters(index = "0", description = "Path to the output file to which the backup will be written. Use - for stdout.") String outputPath) {
-		try {
-			return 0;
-		} catch (Exception e) {
-			log.error("Error while running collection backup.", e);
-			return 10;
-		}
+	public PointAction(QDrantCommand command) {
+		super(command);
 	}
 
-	@Command(name = "points", description = "Backup point data of a collection")
-	public int backupPoints(
-
-		@Option(names = { "-c", "--collection" }, description = "Name of the collection to backup") String collectionName,
-		@Option(names = { "-b", "--batch-size" }, description = "Size of the point batches being loaded from the server. Default: "
-			+ DEFAULT_BATCH_SIZE, defaultValue = DEFAULT_BATCH_SIZE_STR) int batchSize,
-		@Parameters(index = "0", description = "Path to the output file to which the backup will be written. Use - for stdout.") String outputPath
-
-	) {
+	public ExitCode backup(int batchSize, String collectionName, String outputPath) {
 		try {
 			if (outputPath == null) {
-				log.error("A output path must be specified");
-				System.exit(11);
+				log.error("A output path must be specified.");
+				return INVALID_PARAMETER;
 			}
-			int port = getPort();
-			String host = getHostname();
+
 			if (log.isDebugEnabled()) {
-				log.debug("Connecting to " + host + ":" + port + " using " + collectionName + " batch-size: " + batchSize);
+				log.debug("Connecting to {} : {} using {} batch-size: {} ", host, port, collectionName, batchSize);
 			}
-			try (QDrantHttpClient client = QDrantHttpClient.builder().setHostname(host).setPort(port).build()) {
+			try (QDrantHttpClient client = newClient()) {
 				if (outputPath.equals("-")) {
 					try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out))) {
 						scrollPoints(client, writer, collectionName, batchSize);
@@ -71,10 +59,31 @@ public class BackupCommand extends AbstractQDrantCommand {
 					}
 				}
 			}
-			return 0;
+			return OK;
 		} catch (Exception e) {
-			log.error("Error while running point backup.", e);
-			return 10;
+			log.error("Error while running point backup for collection [{}]", collectionName, e);
+			return ERROR;
+		}
+	}
+
+	public ExitCode count(String collectionName, boolean exact) {
+		try {
+			try (QDrantHttpClient client = newClient()) {
+				PointCountRequest request = new PointCountRequest();
+				request.setExact(exact);
+				PointCountResponse response = client.countPoints(collectionName, request).sync();
+				if (isSuccess(response)) {
+					long count = response.getResult().getCount();
+					System.out.println("Points: " + count);
+				} else {
+					log.error("Loading point count failed with status [{}]", response.getStatus());
+					return SERVER_FAILURE;
+				}
+			}
+			return OK;
+		} catch (Exception e) {
+			log.error("Error while counting points for collection [{}]", collectionName, e);
+			return ERROR;
 		}
 	}
 
@@ -87,7 +96,7 @@ public class BackupCommand extends AbstractQDrantCommand {
 			request.setWithPayload(true);
 			request.setWithVector(true);
 			PointsScrollResponse response = client.scrollPoints(collectionName, request).sync();
-			if ("ok".equals(response.getStatus())) {
+			if (isSuccess(response)) {
 				ScrollResult result = response.getResult();
 				if (result.getPoints().isEmpty()) {
 					break;
@@ -106,11 +115,12 @@ public class BackupCommand extends AbstractQDrantCommand {
 					break;
 				}
 			} else {
-				log.error("Scroll request failed with status: " + response.getStatus());
+				log.error("Scroll request failed with status: [{}]", response.getStatus());
 				break;
 			}
 		}
 		writer.flush();
 
 	}
+
 }

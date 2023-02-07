@@ -9,16 +9,16 @@ Still in development
 ## Open Tasks
 
 - [x] Add maven enforcer plugin
-- [ ] Configure logging
-- [ ] Add additional tests
-- [ ] Add github actions building
+- [x] Configure logging
+- [x] Add additional tests
+- [x] Add github actions building
 - [ ] Add sonarcloud checks
-- [ ] Setup jreleaser native build releases to github
+- [x] Setup jreleaser native build releases to github
 - [ ] Remove bogus native-image files
 - [ ] Use count API to enable progress computation and add ETA
 - [ ] Check error handling
-- [ ] Test locking, snapshot handling
-- [ ] Maybe: Mac, Windows Build?
+- [x] Test locking, snapshot handling
+- [x] Maybe: Mac, Windows Build?
 
 ## Building
 

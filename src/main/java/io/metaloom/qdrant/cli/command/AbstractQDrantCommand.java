@@ -1,6 +1,6 @@
 package io.metaloom.qdrant.cli.command;
 
-import java.util.concurrent.Callable;
+import static io.metaloom.qdrant.cli.ExitCode.OK;
 
 import io.metaloom.qdrant.cli.QDrantCLI;
 import picocli.CommandLine.Command;
@@ -9,7 +9,7 @@ import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
 
 @Command
-public abstract class AbstractQDrantCommand implements Callable<Integer> {
+public abstract class AbstractQDrantCommand implements QDrantCommand {
 
 	public static final int DEFAULT_BATCH_SIZE = 1000;
 
@@ -24,13 +24,15 @@ public abstract class AbstractQDrantCommand implements Callable<Integer> {
 	@Override
 	public Integer call() {
 		spec.commandLine().usage(System.out);
-		return 0;
+		return OK.code();
 	}
 
+	@Override
 	public String getHostname() {
 		return parent.getHostname();
 	}
 
+	@Override
 	public int getPort() {
 		return parent.getPort();
 	}
