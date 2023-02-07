@@ -21,8 +21,10 @@ import io.metaloom.qdrant.client.http.model.point.PointsScrollRequest;
 import io.metaloom.qdrant.client.http.model.point.PointsScrollResponse;
 import io.metaloom.qdrant.client.http.model.point.Record;
 import io.metaloom.qdrant.client.http.model.point.ScrollResult;
+import io.metaloom.qdrant.client.http.model.service.LockOption;
 import io.metaloom.qdrant.client.http.model.service.LockOptionResponse;
 import io.metaloom.qdrant.client.http.model.service.LockRequest;
+import io.metaloom.qdrant.client.http.model.snapshot.SnapshotDescription;
 import io.metaloom.qdrant.client.http.model.snapshot.SnapshotListResponse;
 import io.metaloom.qdrant.client.http.model.snapshot.SnapshotRecoverRequest;
 import io.metaloom.qdrant.client.http.model.snapshot.SnapshotResponse;
@@ -64,12 +66,14 @@ class RuntimeReflectionRegistrationFeature implements Feature {
 		registerFully(ClusterStatusResponse.class);
 		registerFully(ClusterInfoResponse.class);
 		registerFully(LockOptionResponse.class);
+		registerFully(LockOption.class);
 		registerFully(LockRequest.class);
 
 		// Snapshots
 		registerFully(SnapshotListResponse.class);
 		registerFully(SnapshotRecoverRequest.class);
 		registerFully(SnapshotResponse.class);
+		registerFully(SnapshotDescription.class);
 
 		System.out.println(" - Registering logback classes");
 		registerFully(ConsoleAppender.class);

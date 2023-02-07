@@ -76,7 +76,7 @@ public class PointAction extends AbstractAction {
 			PointCountResponse response = client.countPoints(collectionName, request).sync();
 			if (isSuccess(response)) {
 				long count = response.getResult().getCount();
-				System.out.println("Points: " + count);
+				log.info("Points: " + count);
 				return OK;
 			} else {
 				log.error("Loading point count failed with status [{}]", response.getStatus());
