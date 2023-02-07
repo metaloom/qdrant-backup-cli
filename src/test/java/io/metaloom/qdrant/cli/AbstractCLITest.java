@@ -73,8 +73,23 @@ public abstract class AbstractCLITest {
 		};
 	}
 
+	public QDrantCommand bogusCommand(int bogusPort) {
+		return new AbstractQDrantCommand() {
+
+			@Override
+			public String getHostname() {
+				return "255.255.255.255";
+			}
+
+			@Override
+			public int getPort() {
+				return bogusPort;
+			}
+		};
+	}
+
 	protected String captureStdOut(Runnable command) throws IOException {
-		setLoggingLevel(Level.ERROR);
+		setLoggingLevel(Level.INFO);
 		qdrant.mute();
 		PrintStream out = System.out;
 		try {
@@ -88,7 +103,7 @@ public abstract class AbstractCLITest {
 		} finally {
 			System.setOut(out);
 			qdrant.unmute();
-			setLoggingLevel(Level.INFO);
+			setLoggingLevel(Level.DEBUG);
 		}
 	}
 

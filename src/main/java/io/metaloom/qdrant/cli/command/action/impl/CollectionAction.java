@@ -1,6 +1,5 @@
 package io.metaloom.qdrant.cli.command.action.impl;
 
-import static io.metaloom.qdrant.cli.ExitCode.ERROR;
 import static io.metaloom.qdrant.cli.ExitCode.OK;
 import static io.metaloom.qdrant.cli.ExitCode.SERVER_FAILURE;
 
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import io.metaloom.qdrant.cli.ExitCode;
 import io.metaloom.qdrant.cli.command.QDrantCommand;
 import io.metaloom.qdrant.cli.command.action.AbstractAction;
-import io.metaloom.qdrant.client.http.QDrantHttpClient;
 import io.metaloom.qdrant.client.http.model.collection.CollectionDescription;
 import io.metaloom.qdrant.client.http.model.collection.CollectionListResponse;
 import io.metaloom.qdrant.client.json.Json;
@@ -31,7 +29,7 @@ public class CollectionAction extends AbstractAction {
 	}
 
 	public ExitCode backup(int batchSize, String outputPath) {
-		try (QDrantHttpClient client = newClient()) {
+		return withClient(client -> {
 			CollectionListResponse response = client.listCollections().sync();
 			if (isSuccess(response)) {
 				List<CollectionDescription> collections = response.getResult().getCollections();
@@ -56,10 +54,7 @@ public class CollectionAction extends AbstractAction {
 				log.error("Listing collections failed with status [{}]", response.getStatus());
 				return SERVER_FAILURE;
 			}
-		} catch (Exception e) {
-			log.error("Error while fetching cluster info from server.", e);
-			return ERROR;
-		}
+		});
 	}
 
 	private void dump(List<CollectionDescription> collections, BufferedWriter writer) throws IOException {

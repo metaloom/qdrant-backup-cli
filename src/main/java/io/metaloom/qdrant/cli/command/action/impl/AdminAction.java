@@ -1,6 +1,5 @@
 package io.metaloom.qdrant.cli.command.action.impl;
 
-import static io.metaloom.qdrant.cli.ExitCode.ERROR;
 import static io.metaloom.qdrant.cli.ExitCode.OK;
 import static io.metaloom.qdrant.cli.ExitCode.SERVER_FAILURE;
 
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import io.metaloom.qdrant.cli.ExitCode;
 import io.metaloom.qdrant.cli.command.QDrantCommand;
 import io.metaloom.qdrant.cli.command.action.AbstractAction;
-import io.metaloom.qdrant.client.http.QDrantHttpClient;
 import io.metaloom.qdrant.client.http.model.service.LockOptionResponse;
 
 public class AdminAction extends AbstractAction {
@@ -30,7 +28,7 @@ public class AdminAction extends AbstractAction {
 	}
 
 	public ExitCode status() {
-		try (QDrantHttpClient client = newClient()) {
+		return withClient(client -> {
 			LockOptionResponse response = client.getLockOptions().sync();
 			if (isSuccess(response)) {
 				String msg = response.getResult().getErrorMessage();
@@ -42,14 +40,11 @@ public class AdminAction extends AbstractAction {
 				log.info("Loading lock options failed with status [{}]", response.getStatus());
 				return SERVER_FAILURE;
 			}
-		} catch (Exception e) {
-			log.error("Error while fetching lock options.", e);
-			return ERROR;
-		}
+		});
 	}
 
 	private ExitCode updateLockOptions(String msg, boolean write) {
-		try (QDrantHttpClient client = newClient()) {
+		return withClient(client -> {
 			LockOptionResponse response = client.setLockOptions(msg, write).sync();
 			if (isSuccess(response)) {
 				log.info("Lock options updated");
@@ -58,10 +53,7 @@ public class AdminAction extends AbstractAction {
 				log.info("Updating lock options failed with status [{}]", response.getStatus());
 				return SERVER_FAILURE;
 			}
-		} catch (Exception e) {
-			log.error("Error while updating lock options.", e);
-			return ERROR;
-		}
+		});
 	}
 
 }

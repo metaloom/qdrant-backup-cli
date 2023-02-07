@@ -11,7 +11,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "collection", aliases = { "c" }, description = "Collection commands")
+@Command(name = "collection", aliases = { "co" }, description = "Collection commands")
 public class CollectionCommand extends AbstractQDrantCommand {
 
 	public static final Logger log = LoggerFactory.getLogger(CollectionCommand.class);

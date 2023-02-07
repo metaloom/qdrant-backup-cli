@@ -8,6 +8,9 @@ public enum ExitCode {
 	// Unexpected error happened
 	ERROR(10),
 
+	// Connection error
+	CONNECT_ERROR(15),
+
 	// Invalid parameters were specified
 	INVALID_PARAMETER(2),
 

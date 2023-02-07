@@ -10,7 +10,7 @@ import io.metaloom.qdrant.cli.command.action.impl.ClusterAction;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "cluster", aliases = { "c" }, description = "Cluster commands. (e.g. peer management, info)")
+@Command(name = "cluster", aliases = { "cl" }, description = "Cluster commands. (e.g. peer management, info)")
 public class ClusterCommand extends AbstractQDrantCommand {
 
 	public static final Logger log = LoggerFactory.getLogger(ClusterCommand.class);

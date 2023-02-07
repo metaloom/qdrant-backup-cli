@@ -9,6 +9,10 @@ Still in development
 ## Open Tasks
 
 - [x] Add maven enforcer plugin
+- [ ] Document exit code
+- [ ] Document usage
+- [ ] Add env variable support
+- [ ] Test junit 5 / eclipse / native test execution
 - [x] Configure logging
 - [x] Add additional tests
 - [x] Add github actions building
@@ -38,9 +42,9 @@ mvn clean package -DskipTests -Pnative
 
 ## Update reflect-config.json (optional)
 
-Reflection is managed via `io.metaloom.qdrant.cli.graalvm.RuntimeReflectionRegistrationFeature` and enabled in `src/main/resources/META-INF/native-image/io.metaloom.qdrant/qdrant-cli/native-image.properties`.
+Reflection is managed via `io.metaloom.qdrant.cli.graalvm.RuntimeReflectionRegistrationFeature` and enabled in `src/main/resources/META-INF/native-image/io.metaloom.qdrant/qdrant-backup-cli/native-image.properties`.
 
 ```bash
 # Run the native-image-agent using the jar (Useful to find missed reflection invocations)
-java -agentlib:native-image-agent=config-merge-dir=src/main/resources/META-INF/native-image/io.metaloom.qdrant/qdrant-cli -jar target/qdrant-cli-0.0.1-SNAPSHOT.jar  backup points -c test -h localhost -p 6333 test.json
+java -agentlib:native-image-agent=config-merge-dir=src/main/resources/META-INF/native-image/io.metaloom.qdrant/qdrant-backup-cli -jar target/qdrant-backup-cli-0.0.1-SNAPSHOT.jar  p count -c test
 ```

@@ -1,6 +1,5 @@
 package io.metaloom.qdrant.cli.command.action.impl;
 
-import static io.metaloom.qdrant.cli.ExitCode.ERROR;
 import static io.metaloom.qdrant.cli.ExitCode.OK;
 import static io.metaloom.qdrant.cli.ExitCode.SERVER_FAILURE;
 
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import io.metaloom.qdrant.cli.ExitCode;
 import io.metaloom.qdrant.cli.command.QDrantCommand;
 import io.metaloom.qdrant.cli.command.action.AbstractAction;
-import io.metaloom.qdrant.client.http.QDrantHttpClient;
 import io.metaloom.qdrant.client.http.model.GenericBooleanStatusResponse;
 import io.metaloom.qdrant.client.http.model.collection.CollectionDescription;
 import io.metaloom.qdrant.client.http.model.collection.CollectionListResponse;
@@ -33,32 +31,30 @@ public class SnapshotAction extends AbstractAction {
 	}
 
 	public ExitCode recover(String collectionName, String snapshotLocation) {
-		try (QDrantHttpClient client = newClient()) {
+		return withClient(client -> {
 			SnapshotRecoverRequest request = new SnapshotRecoverRequest();
 			request.setLocation(snapshotLocation);
 			log.info("Recover from snapshot [{}] to collection [{}]", snapshotLocation, collectionName);
 			GenericBooleanStatusResponse response = client.recoverSnapshot(collectionName, request).sync();
 			if (isSuccess(response)) {
-				System.out.println("Recovery completed without errors.");
+				log.info("Recovery completed without errors.");
 				return OK;
 			} else {
-				log.error("Recovery of snapshot {} for collection {} failed with status {}", snapshotLocation, collectionName, response.getStatus());
+				log.error("Recovery of snapshot {} for collection {} failed with status {}", snapshotLocation,
+						collectionName, response.getStatus());
 				return SERVER_FAILURE;
 			}
-		} catch (Exception e) {
-			log.error("Error while fetching cluster info from server.", e);
-			return ERROR;
-		}
+		});
 	}
 
 	public ExitCode snapshot(String collectionNames) {
-		try (QDrantHttpClient client = newClient()) {
-
+		return withClient(client -> {
 			List<String> collections = Arrays.asList(collectionNames.split(","));
 			if ("*".equalsIgnoreCase(collectionNames)) {
 				CollectionListResponse response = client.listCollections().sync();
 				if (isSuccess(response)) {
-					collections = response.getResult().getCollections().stream().map(CollectionDescription::getName).collect(Collectors.toList());
+					collections = response.getResult().getCollections().stream().map(CollectionDescription::getName)
+							.collect(Collectors.toList());
 					if (log.isDebugEnabled()) {
 						log.debug("Loaded list of {} from server.", collections.size());
 					}
@@ -79,15 +75,11 @@ public class SnapshotAction extends AbstractAction {
 				}
 			}
 			return OK;
-		} catch (Exception e) {
-			log.error("Error while fetching cluster info from server.", e);
-			return ERROR;
-		}
-
+		});
 	}
 
 	public ExitCode list(String collectionName) {
-		try (QDrantHttpClient client = newClient()) {
+		return withClient(client -> {
 			SnapshotListResponse response = client.listCollectionSnapshots(collectionName).sync();
 			if (isSuccess(response)) {
 				List<SnapshotDescription> snapshots = response.getResult();
@@ -95,21 +87,18 @@ public class SnapshotAction extends AbstractAction {
 					log.info("No snapshots found");
 					return OK;
 				} else {
-					System.out.println("[Name] - [Creation Time] - [Size]");
+					log.info("[Name] - [Creation Time] - [Size]");
 				}
 				for (SnapshotDescription snapshot : snapshots) {
 					String humanSize = FileUtils.byteCountToDisplaySize(snapshot.getSize());
-					System.out.println(snapshot.getName() + " @ " + snapshot.getCreationTime() + " " + humanSize);
+					log.info(snapshot.getName() + " @ " + snapshot.getCreationTime() + " " + humanSize);
 				}
 				return OK;
 			} else {
 				log.error("Listing snapshots failed with status [{}]", response.getStatus());
 				return SERVER_FAILURE;
 			}
-		} catch (Exception e) {
-			log.error("Error while listing snapshots.", e);
-			return ERROR;
-		}
+		});
 	}
 
 }

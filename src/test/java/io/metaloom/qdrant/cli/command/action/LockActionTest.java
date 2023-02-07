@@ -37,7 +37,6 @@ public class LockActionTest extends AbstractCLITest {
 		} else {
 			assertFalse("Write should be disabled", result.isWrite());
 		}
-
 	}
 
 }

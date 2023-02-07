@@ -1,6 +1,5 @@
 package io.metaloom.qdrant.cli.command.action.impl;
 
-import static io.metaloom.qdrant.cli.ExitCode.ERROR;
 import static io.metaloom.qdrant.cli.ExitCode.INVALID_PARAMETER;
 import static io.metaloom.qdrant.cli.ExitCode.OK;
 import static io.metaloom.qdrant.cli.ExitCode.SERVER_FAILURE;
@@ -34,60 +33,60 @@ public class PointAction extends AbstractAction {
 	}
 
 	public ExitCode backup(int batchSize, String collectionName, String outputPath) {
-		try {
-			if (outputPath == null) {
-				log.error("A output path must be specified.");
-				return INVALID_PARAMETER;
-			}
+		if (collectionName == null) {
+			log.error("Missing collection name");
+			return INVALID_PARAMETER;
+		}
+		if (outputPath == null) {
+			log.error("A output path must be specified.");
+			return INVALID_PARAMETER;
+		}
 
-			if (log.isDebugEnabled()) {
-				log.debug("Connecting to {} : {} using {} batch-size: {} ", host, port, collectionName, batchSize);
-			}
-			try (QDrantHttpClient client = newClient()) {
-				if (outputPath.equals("-")) {
-					try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out))) {
-						scrollPoints(client, writer, collectionName, batchSize);
-					}
-				} else {
-					File outputFile = new File(outputPath);
-					// if (!outputFile.canWrite()) {
-					// log.error("Unable to write to " + outputFile.getAbsolutePath());
-					// System.exit(12);
-					// }
-					try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-						scrollPoints(client, writer, collectionName, batchSize);
-					}
+		if (log.isDebugEnabled()) {
+			log.debug("Connecting to {} : {} using {} batch-size: {} ", host, port, collectionName, batchSize);
+		}
+		return withClient(client -> {
+			if (outputPath.equals("-")) {
+				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out))) {
+					scrollPoints(client, writer, collectionName, batchSize);
+				}
+			} else {
+				File outputFile = new File(outputPath);
+				// if (!outputFile.canWrite()) {
+				// log.error("Unable to write to " + outputFile.getAbsolutePath());
+				// System.exit(12);
+				// }
+				try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+					scrollPoints(client, writer, collectionName, batchSize);
 				}
 			}
 			return OK;
-		} catch (Exception e) {
-			log.error("Error while running point backup for collection [{}]", collectionName, e);
-			return ERROR;
-		}
+		});
+
 	}
 
 	public ExitCode count(String collectionName, boolean exact) {
-		try {
-			try (QDrantHttpClient client = newClient()) {
-				PointCountRequest request = new PointCountRequest();
-				request.setExact(exact);
-				PointCountResponse response = client.countPoints(collectionName, request).sync();
-				if (isSuccess(response)) {
-					long count = response.getResult().getCount();
-					System.out.println("Points: " + count);
-				} else {
-					log.error("Loading point count failed with status [{}]", response.getStatus());
-					return SERVER_FAILURE;
-				}
-			}
-			return OK;
-		} catch (Exception e) {
-			log.error("Error while counting points for collection [{}]", collectionName, e);
-			return ERROR;
+		if (collectionName == null) {
+			log.error("Missing collection name");
+			return INVALID_PARAMETER;
 		}
+		return withClient(client -> {
+			PointCountRequest request = new PointCountRequest();
+			request.setExact(exact);
+			PointCountResponse response = client.countPoints(collectionName, request).sync();
+			if (isSuccess(response)) {
+				long count = response.getResult().getCount();
+				System.out.println("Points: " + count);
+				return OK;
+			} else {
+				log.error("Loading point count failed with status [{}]", response.getStatus());
+				return SERVER_FAILURE;
+			}
+		});
 	}
 
-	private void scrollPoints(QDrantHttpClient client, BufferedWriter writer, String collectionName, int batchSize) throws Exception {
+	private void scrollPoints(QDrantHttpClient client, BufferedWriter writer, String collectionName, int batchSize)
+			throws Exception {
 		Long offset = 0L;
 		while (true) {
 			PointsScrollRequest request = new PointsScrollRequest();

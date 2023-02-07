@@ -9,7 +9,7 @@ import io.metaloom.qdrant.cli.command.AbstractQDrantCommand;
 import io.metaloom.qdrant.cli.command.action.impl.SnapshotAction;
 import picocli.CommandLine.Command;
 
-@Command(name = "snapshot", aliases = { "snap" }, description = "Snapshot commands. (e.g. create and restore snapshots)")
+@Command(name = "snapshot", aliases = { "s" }, description = "Snapshot commands. (e.g. create and restore snapshots)")
 public class SnapshotCommand extends AbstractQDrantCommand {
 
 	public static final Logger log = LoggerFactory.getLogger(SnapshotCommand.class);
