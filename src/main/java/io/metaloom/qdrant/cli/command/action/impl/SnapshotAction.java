@@ -87,11 +87,11 @@ public class SnapshotAction extends AbstractAction {
 					log.info("No snapshots found");
 					return OK;
 				} else {
-					log.info("[Name] - [Creation Time] - [Size]");
+					log.info("[Name]\t[Creation Time]\t[Size]");
 				}
 				for (SnapshotDescription snapshot : snapshots) {
 					String humanSize = FileUtils.byteCountToDisplaySize(snapshot.getSize());
-					log.info(snapshot.getName() + " @ " + snapshot.getCreationTime() + " " + humanSize);
+					log.info(snapshot.getName() + "\t" + snapshot.getCreationTime() + "\t" + humanSize);
 				}
 				return OK;
 			} else {

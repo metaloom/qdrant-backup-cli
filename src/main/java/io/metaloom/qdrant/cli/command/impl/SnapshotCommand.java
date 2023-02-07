@@ -34,8 +34,8 @@ public class SnapshotCommand extends AbstractQDrantCommand {
 		}
 	}
 
-	@Command(name = "snapshot", description = "Create snapshots")
-	public int snapshot(String collectionNames) {
+	@Command(name = "create", description = "Create snapshots")
+	public int create(String collectionNames) {
 		try {
 			return new SnapshotAction(this).snapshot(collectionNames).code();
 		} catch (Exception e) {

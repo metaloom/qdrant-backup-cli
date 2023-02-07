@@ -8,6 +8,7 @@ import ch.qos.logback.classic.pattern.LineSeparatorConverter;
 import ch.qos.logback.classic.pattern.MessageConverter;
 import ch.qos.logback.core.ConsoleAppender;
 import io.metaloom.qdrant.client.http.model.cluster.ClusterInfoResponse;
+import io.metaloom.qdrant.client.http.model.cluster.ClusterStatus;
 import io.metaloom.qdrant.client.http.model.cluster.ClusterStatusResponse;
 import io.metaloom.qdrant.client.http.model.collection.CollectionDescription;
 import io.metaloom.qdrant.client.http.model.collection.CollectionListResponse;
@@ -66,6 +67,7 @@ class RuntimeReflectionRegistrationFeature implements Feature {
 		registerFully(ClusterStatusResponse.class);
 		registerFully(ClusterInfoResponse.class);
 		registerFully(LockOptionResponse.class);
+		registerFully(ClusterStatus.class);
 		registerFully(LockOption.class);
 		registerFully(LockRequest.class);
 

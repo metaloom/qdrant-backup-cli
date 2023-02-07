@@ -28,4 +28,12 @@ public class ErrorHandlingTest extends AbstractCLITest {
 		});
 		assertEquals("Could not connect to server: Network is unreachable\n", out1);
 	}
+
+	@Test
+	public void test404Error() throws IOException {
+		String out1 = captureStdOut(() -> {
+			assertEquals(ERROR, new SnapshotAction(dummyCommand()).list("bogus"));
+		});
+		assertEquals("Error Request failed {Not Found}\n", out1);
+	}
 }
