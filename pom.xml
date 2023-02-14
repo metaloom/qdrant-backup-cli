@@ -109,7 +109,7 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>jrelease</id>
+			<id>release</id>
 			<activation>
 				<property>
 					<name>release</name>
