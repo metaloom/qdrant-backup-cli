@@ -14,7 +14,6 @@ import io.metaloom.qdrant.client.http.model.collection.CollectionDescription;
 import io.metaloom.qdrant.client.http.model.collection.CollectionInfo;
 import io.metaloom.qdrant.client.http.model.collection.CollectionListResponse;
 import io.metaloom.qdrant.client.http.model.collection.CollectionResponse;
-import io.metaloom.qdrant.client.http.model.collection.CollectionStatus;
 import io.metaloom.qdrant.client.http.model.collection.CollectionsResponse;
 import io.metaloom.qdrant.client.http.model.collection.PayloadIndexInfo;
 import io.metaloom.qdrant.client.http.model.collection.filter.Filter;

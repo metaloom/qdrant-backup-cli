@@ -15,10 +15,10 @@ public class ClusterActionTest extends AbstractCLITest {
 
 	@Test
 	public void testClusterInfo() throws IOException {
-		String out1 = captureStdOut(() -> {
+		String stdout = captureStdOut(() -> {
 			assertEquals(OK, new ClusterAction(dummyCommand()).info());
 		});
-		assertEquals("Cluster Status: disabled\n", out1);
+		assertEquals("Cluster Status: disabled\n", stdout);
 	}
 
 	@Test

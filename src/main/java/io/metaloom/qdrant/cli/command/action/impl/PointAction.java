@@ -8,7 +8,16 @@ import static io.metaloom.qdrant.cli.ExitCode.SERVER_FAILURE;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +29,21 @@ import io.metaloom.qdrant.cli.eta.ETAUtil;
 import io.metaloom.qdrant.client.http.QDrantHttpClient;
 import io.metaloom.qdrant.client.http.model.point.PointCountRequest;
 import io.metaloom.qdrant.client.http.model.point.PointCountResponse;
+import io.metaloom.qdrant.client.http.model.point.PointStruct;
+import io.metaloom.qdrant.client.http.model.point.PointsListUpsertRequest;
 import io.metaloom.qdrant.client.http.model.point.PointsScrollRequest;
 import io.metaloom.qdrant.client.http.model.point.PointsScrollResponse;
 import io.metaloom.qdrant.client.http.model.point.Record;
 import io.metaloom.qdrant.client.http.model.point.ScrollResult;
 import io.metaloom.qdrant.client.json.Json;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
 
 public class PointAction extends AbstractAction {
 
 	public static final Logger log = LoggerFactory.getLogger(PointAction.class);
+
+	private static final long RESTORE_OPERATION_TIMEOUT_MS = 10_000;
 
 	public PointAction(QDrantCommand command) {
 		super(command);
@@ -77,6 +92,83 @@ public class PointAction extends AbstractAction {
 
 	}
 
+	public ExitCode restore(int batchSize, String collectionName, String inputPath) {
+		if (collectionName == null) {
+			log.error("Missing collection name");
+			return INVALID_PARAMETER;
+		}
+		if (inputPath == null) {
+			log.error("A input path must be specified.");
+			return INVALID_PARAMETER;
+		}
+
+		if (log.isDebugEnabled()) {
+			log.debug("Connecting to {} : {} using {} batch-size: {} ", host, port, collectionName, batchSize);
+		}
+		Path input = Paths.get(inputPath);
+		if (!Files.exists(input)) {
+			log.error("Could not find file " + inputPath);
+			return INVALID_PARAMETER;
+		}
+
+		return withClient(client -> {
+			long total = countLines(input);
+			// Form batches and submit them to the server
+			try (Stream<String> lines = Files.lines(input, StandardCharsets.UTF_8)) {
+				AtomicLong batchesCompleted = new AtomicLong();
+				long batchesNeeded = total / batchSize;
+				Observable.fromStream(lines)
+					.map(this::toPoint)
+					.buffer(batchSize)
+					.map(batch -> submitBatch(client, collectionName, batch, total))
+					.blockingSubscribe(c -> {
+						c.blockingAwait(RESTORE_OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+						long current = batchesCompleted.incrementAndGet();
+						if (current * batchSize % 10 == 0) {
+							log.info("[" + ETAUtil.getPercent(current, batchesNeeded) + "] written");
+						}
+					}, err -> {
+						log.error("Failed to upsert points", err);
+					});
+				log.info("[100%] written");
+			}
+			return OK;
+		});
+
+	}
+
+	private PointStruct toPoint(String json) {
+		try {
+			return Json.parse(json, PointStruct.class);
+		} catch (Exception e) {
+			log.error("Error while deserializing point from json line: {}", json, e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	private long countLines(Path input) throws IOException {
+		try (Stream<String> lines = Files.lines(input, StandardCharsets.UTF_8)) {
+			return lines.count();
+		}
+	}
+
+	public Completable submitBatch(QDrantHttpClient client, String collectionName, List<PointStruct> batch, long total) {
+		return Completable.defer(() -> {
+			try {
+				if (log.isDebugEnabled()) {
+					log.debug("Preparing upsert request with {} elements.", batch.size());
+				}
+				PointsListUpsertRequest request = new PointsListUpsertRequest();
+				for (PointStruct point : batch) {
+					request.addPoint(point);
+				}
+				return client.upsertPoints(collectionName, request, false).async().ignoreElement();
+			} catch (Exception e) {
+				return Completable.error(e);
+			}
+		});
+	}
+
 	public ExitCode count(String collectionName, boolean exact) {
 		if (collectionName == null) {
 			log.error("Missing collection name");
@@ -98,7 +190,7 @@ public class PointAction extends AbstractAction {
 	}
 
 	private long scrollPoints(QDrantHttpClient client, BufferedWriter writer, String collectionName, int batchSize,
-			long totalCount, boolean printETA) throws Exception {
+		long totalCount, boolean printETA) throws Exception {
 		long current = 0;
 		Long offset = 0L;
 		long start = System.currentTimeMillis();
@@ -124,7 +216,7 @@ public class PointAction extends AbstractAction {
 					current++;
 					if (printETA && current % 10_000 == 0) {
 						log.info("[" + ETAUtil.getPercent(current, totalCount) + "] "
-								+ ETAUtil.getETA(current, totalCount, start, System.currentTimeMillis()));
+							+ ETAUtil.getETA(current, totalCount, start, System.currentTimeMillis()));
 					}
 				}
 				writer.flush();
@@ -137,7 +229,7 @@ public class PointAction extends AbstractAction {
 				break;
 			}
 		}
-		log.info("[" + ETAUtil.getPercent(totalCount, totalCount) + "]");
+		log.info("[" + ETAUtil.getPercent(totalCount, totalCount) + "] read");
 		writer.flush();
 		return current;
 

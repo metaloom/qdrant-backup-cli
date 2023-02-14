@@ -49,4 +49,21 @@ public class PointCommand extends AbstractQDrantCommand {
 		}
 	}
 
+	@Command(name = "restore", description = "Restore the point data of a collection via upsert requests to the server.")
+	public int restore(
+
+		@Option(names = { "-c", "--collection" }, description = "Name of the collection to which the points will be restored") String collectionName,
+		@Option(names = { "-b", "--batch-size" }, description = "Size of the point batches being written to the server. Default: "
+			+ DEFAULT_BATCH_SIZE, defaultValue = DEFAULT_BATCH_SIZE_STR) int batchSize,
+		@Parameters(index = "0", description = "Path to the input file from which the backup will be read. Use - for stdin.") String inputPath
+
+	) {
+		try {
+			return new PointAction(this).restore(batchSize, collectionName, inputPath).code();
+		} catch (Exception e) {
+			log.error("Error while running point restore.", e);
+			return ERROR.code();
+		}
+	}
+
 }

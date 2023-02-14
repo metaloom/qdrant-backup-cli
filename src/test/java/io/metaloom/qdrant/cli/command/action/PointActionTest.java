@@ -11,6 +11,11 @@ import org.junit.Test;
 
 import io.metaloom.qdrant.cli.AbstractCLITest;
 import io.metaloom.qdrant.cli.command.action.impl.PointAction;
+import io.metaloom.qdrant.client.http.QDrantHttpClient;
+import io.metaloom.qdrant.client.http.impl.HttpErrorException;
+import io.metaloom.qdrant.client.http.model.collection.CollectionCreateRequest;
+import io.metaloom.qdrant.client.http.model.collection.config.Distance;
+import io.metaloom.qdrant.client.http.model.point.PointCountRequest;
 
 public class PointActionTest extends AbstractCLITest {
 
@@ -28,7 +33,28 @@ public class PointActionTest extends AbstractCLITest {
 		});
 		assertEquals("", out2);
 		assertTrue(tmpFile.exists());
+	}
 
+	@Test
+	public void testRestorePoints() throws HttpErrorException, IOException {
+		File tmpFile = prepareTestFile("point-dump-test-2");
+		assertEquals(OK, new PointAction(dummyCommand()).backup(5, TEST_COLLECTION_NAME, tmpFile.getAbsolutePath()));
+
+		// Create second collection for restore purpose
+		final String TEST_RESTORE_COLLECTION_NAME = TEST_COLLECTION_NAME + "_2";
+		try (QDrantHttpClient client = newClient()) {
+			CollectionCreateRequest request = new CollectionCreateRequest();
+			request.setVectors(4, Distance.EUCLID);
+			client.createCollection(TEST_RESTORE_COLLECTION_NAME, request).sync();
+		}
+
+		assertEquals(OK, new PointAction(dummyCommand()).restore(5, TEST_RESTORE_COLLECTION_NAME, tmpFile.getAbsolutePath()));
+
+		try (QDrantHttpClient client = newClient()) {
+			PointCountRequest request = new PointCountRequest().setExact(true);
+			long count = client.countPoints(TEST_RESTORE_COLLECTION_NAME, request).sync().getResult().getCount();
+			assertEquals("The new collection should now have points in it.", TEST_SIZE, count);
+		}
 	}
 
 	@Test
