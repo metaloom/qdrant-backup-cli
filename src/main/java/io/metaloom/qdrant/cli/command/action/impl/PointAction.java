@@ -1,14 +1,17 @@
 package io.metaloom.qdrant.cli.command.action.impl;
 
+import static io.metaloom.qdrant.cli.ExitCode.ERROR;
 import static io.metaloom.qdrant.cli.ExitCode.FILE_ERROR;
 import static io.metaloom.qdrant.cli.ExitCode.INVALID_PARAMETER;
 import static io.metaloom.qdrant.cli.ExitCode.OK;
 import static io.metaloom.qdrant.cli.ExitCode.SERVER_FAILURE;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -105,33 +108,53 @@ public class PointAction extends AbstractAction {
 		if (log.isDebugEnabled()) {
 			log.debug("Connecting to {} : {} using {} batch-size: {} ", host, port, collectionName, batchSize);
 		}
-		Path input = Paths.get(inputPath);
-		if (!Files.exists(input)) {
-			log.error("Could not find file " + inputPath);
-			return INVALID_PARAMETER;
+		if (inputPath.equals("-")) {
+			// TODO check for EOF
+			try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in))) {
+				Stream<String> stream = in.lines();
+				return restore(stream, collectionName, 0, batchSize);
+			} catch (IOException e) {
+				log.error("Error while running restore", e);
+				return ERROR;
+			}
+		} else {
+			Path input = Paths.get(inputPath);
+			if (!Files.exists(input)) {
+				log.error("Could not find file " + inputPath);
+				return INVALID_PARAMETER;
+			}
+			try {
+				long total = countLines(input);
+				try (Stream<String> lines = Files.lines(input, StandardCharsets.UTF_8)) {
+					return restore(lines, collectionName, total, batchSize);
+				}
+			} catch (Exception e) {
+				log.error("Error while running restore", e);
+				return ERROR;
+			}
 		}
 
+	}
+
+	private ExitCode restore(Stream<String> feed, String collectionName, long total, int batchSize) {
 		return withClient(client -> {
-			long total = countLines(input);
 			// Form batches and submit them to the server
-			try (Stream<String> lines = Files.lines(input, StandardCharsets.UTF_8)) {
-				AtomicLong batchesCompleted = new AtomicLong();
-				long batchesNeeded = total / batchSize;
-				Observable.fromStream(lines)
-					.map(this::toPoint)
-					.buffer(batchSize)
-					.map(batch -> submitBatch(client, collectionName, batch, total))
-					.blockingSubscribe(c -> {
-						c.blockingAwait(RESTORE_OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-						long current = batchesCompleted.incrementAndGet();
-						if (current * batchSize % 10 == 0) {
-							log.info("[" + ETAUtil.getPercent(current, batchesNeeded) + "] written");
-						}
-					}, err -> {
-						log.error("Failed to upsert points", err);
-					});
-				log.info("[100%] written");
-			}
+			AtomicLong batchesCompleted = new AtomicLong();
+			long batchesNeeded = total / batchSize;
+			Observable.fromStream(feed)
+				.map(this::toPoint)
+				.buffer(batchSize)
+				.map(batch -> submitBatch(client, collectionName, batch, total))
+				.blockingSubscribe(c -> {
+					c.blockingAwait(RESTORE_OPERATION_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+					long current = batchesCompleted.incrementAndGet();
+					if (current * batchSize % 500 == 0) {
+						log.info("[" + ETAUtil.getPercent(current, batchesNeeded) + "] written");
+					}
+				}, err -> {
+					log.error("Failed to upsert points", err);
+				});
+			log.info("[100%] written");
 			return OK;
 		});
 
